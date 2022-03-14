@@ -66,6 +66,13 @@
         android:textColor="@color/black"
         android:textSize="24sp" />
 
+    <ImageView
+        android:id="@+id/uploadBookCover"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="15dp"
+        android:src="@drawable/cloud_upload" />
+
     <RatingBar
         android:id="@+id/addRatingBar"
         android:layout_width="wrap_content"

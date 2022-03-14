@@ -5,6 +5,7 @@ class Book(
     var Name_Book: String = "",
     var Name_Author: String = "",
     var Launch_Year: String = "",
-    var Price: String = "",
+    var Price_Book: String = "",
+    var Image_Book: String = "",
     var Book_Review: String = ""
 )
