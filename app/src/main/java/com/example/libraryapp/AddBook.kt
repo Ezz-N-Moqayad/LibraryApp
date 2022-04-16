@@ -32,6 +32,8 @@ class AddBook : AppCompatActivity() {
 
     lateinit var database: DatabaseReference;
     lateinit var progressDialog: ProgressDialog
+
+
     private val Pick_IMAGE_REQUEST = 111
     var imageURI: Uri? = null
     private var flo = 0f
