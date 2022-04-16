@@ -13,9 +13,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
@@ -32,7 +31,7 @@ class EditingBook : AppCompatActivity() {
     private lateinit var editBook: Button
     private lateinit var deleteBook: Button
 
-    private var db: FirebaseFirestore? = null
+    lateinit var database: DatabaseReference
     private var progressDialog: ProgressDialog? = null
     private val PICK_IMAGE_REQUEST = 111
     var imageURI: Uri? = null
@@ -52,7 +51,7 @@ class EditingBook : AppCompatActivity() {
         editBook = findViewById(R.id.editBook)
         deleteBook = findViewById(R.id.deleteBook)
 
-        db = Firebase.firestore
+        database = Firebase.database.reference
         val storageRef = Firebase.storage.reference
         val imageRef = storageRef.child("Image Book")
 
@@ -146,38 +145,34 @@ class EditingBook : AppCompatActivity() {
     }
 
     private fun editBook(edo: Int, Image_Book: String) {
-        db!!.collection("Books").get().addOnSuccessListener { querySnapshot ->
-            for (document in querySnapshot) {
-                document.toObject<Book>()
-                if (document.get("id") == intent.getStringExtra("id")) {
-                    if (edo == 1) {
-                        db!!.collection("Books").document(document.id)
-                            .update("Image_Book", Image_Book)
-                    }
-                    db!!.collection("Books").document(document.id)
-                        .update("Name_Book", editNameBook.text.toString())
-                    db!!.collection("Books").document(document.id)
-                        .update("Name_Author", editNameAuthor.text.toString())
-                    db!!.collection("Books").document(document.id)
-                        .update("Launch_Year", editLaunchYear.text.toString())
-                    db!!.collection("Books").document(document.id)
-                        .update("Price_Book", editPrice.text.toString())
-                    db!!.collection("Books").document(document.id)
-                        .update("Book_Review", flo.toString())
-                }
-            }
+
+        var values = hashMapOf<String, Any>()
+        if (edo == 1) {
+            values = hashMapOf(
+                "Name_Book" to editNameBook.text.toString(),
+                "Name_Author" to editNameAuthor.text.toString(),
+                "Launch_Year" to editLaunchYear.text.toString(),
+                "Price_Book" to editPrice.text.toString(),
+                "Book_Review" to flo.toString(),
+                "Image_Book" to Image_Book
+            )
+        } else {
+            values = hashMapOf(
+                "Name_Book" to editNameBook.text.toString(),
+                "Name_Author" to editNameAuthor.text.toString(),
+                "Launch_Year" to editLaunchYear.text.toString(),
+                "Price_Book" to editPrice.text.toString(),
+                "Book_Review" to flo.toString()
+            )
         }
+
+        val id = intent.getStringExtra("id").toString()
+        database.child("Books").child(id).updateChildren(values)
     }
 
     private fun deleteBook() {
-        db!!.collection("Books").get().addOnSuccessListener { querySnapshot ->
-            for (document in querySnapshot) {
-                document.toObject<Book>()
-                if (document.get("id") == intent.getStringExtra("id")) {
-                    db!!.collection("Books").document(document.id).delete()
-                }
-            }
-        }
+        val id = intent.getStringExtra("id").toString()
+        database.child("Books").child(id).removeValue()
     }
 
     private fun showDialog() {

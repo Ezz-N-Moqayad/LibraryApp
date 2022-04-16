@@ -13,8 +13,8 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
 import java.io.ByteArrayOutputStream
@@ -30,8 +30,8 @@ class AddBook : AppCompatActivity() {
     private lateinit var addRatingBar: RatingBar
     private lateinit var addBook: Button
 
-    private var db: FirebaseFirestore? = null
-    private var progressDialog: ProgressDialog? = null
+    lateinit var database: DatabaseReference;
+    lateinit var progressDialog: ProgressDialog
     private val Pick_IMAGE_REQUEST = 111
     var imageURI: Uri? = null
     private var flo = 0f
@@ -49,7 +49,7 @@ class AddBook : AppCompatActivity() {
         addRatingBar = findViewById(R.id.addRatingBar)
         addBook = findViewById(R.id.addBook)
 
-        db = Firebase.firestore
+        database = Firebase.database.reference
         val id = System.currentTimeMillis()
         val storageRef = Firebase.storage.reference
         val imageRef = storageRef.child("Image Book")
@@ -97,7 +97,7 @@ class AddBook : AppCompatActivity() {
                     bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
                     val data = baos.toByteArray()
                     val childRef = imageRef.child(System.currentTimeMillis().toString() + ".png")
-                    var uploadTask = childRef.putBytes(data)
+                    val uploadTask = childRef.putBytes(data)
                     uploadTask.addOnFailureListener { exception ->
                         hideDialog()
                     }.addOnSuccessListener {
@@ -143,7 +143,7 @@ class AddBook : AppCompatActivity() {
             "Image_Book" to image,
             "Book_Review" to bookReview
         )
-        db!!.collection("Books").add(book)
+        database.child("Books/$id").setValue(book)
     }
 
     private fun showDialog() {

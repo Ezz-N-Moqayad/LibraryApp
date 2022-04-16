@@ -12,11 +12,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.firebase.ui.firestore.FirestoreRecyclerAdapter
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
+import com.firebase.ui.database.FirebaseRecyclerAdapter
+import com.firebase.ui.database.FirebaseRecyclerOptions
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 
 class ViewBooks : AppCompatActivity() {
@@ -24,8 +24,8 @@ class ViewBooks : AppCompatActivity() {
     private lateinit var addBooks: FloatingActionButton
     private lateinit var rcvBook: RecyclerView
 
-    private var db: FirebaseFirestore? = null
-    private var adapter: FirestoreRecyclerAdapter<Book, BookViewHolder>? = null
+    lateinit var database: DatabaseReference;
+    private var adapter: FirebaseRecyclerAdapter<Book, BookViewHolder>? = null
     var count = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +34,7 @@ class ViewBooks : AppCompatActivity() {
 
         addBooks = findViewById(R.id.add_Books)
 
-        db = Firebase.firestore
+        database = Firebase.database.reference
         getAllBook()
 
         addBooks.setOnClickListener {
@@ -45,19 +45,13 @@ class ViewBooks : AppCompatActivity() {
     private fun getAllBook() {
         rcvBook = findViewById(R.id.rvBook)
 
-        val query = db!!.collection("Books")
-        val options = FirestoreRecyclerOptions.Builder<Book>().setQuery(
-            query,
-            Book::class.java
-        ).build()
 
-        adapter = object : FirestoreRecyclerAdapter<Book, BookViewHolder>(options) {
+        val query = database.child("Books")
+        val options = FirebaseRecyclerOptions.Builder<Book>().setQuery(query, Book::class.java).build()
+
+        adapter = object : FirebaseRecyclerAdapter<Book, BookViewHolder>(options) {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookViewHolder {
-                val view = LayoutInflater.from(this@ViewBooks).inflate(
-                    R.layout.book_item,
-                    parent,
-                    false
-                )
+                val view = LayoutInflater.from(this@ViewBooks).inflate(R.layout.book_item, parent, false)
                 return BookViewHolder(view)
             }
 
@@ -69,6 +63,7 @@ class ViewBooks : AppCompatActivity() {
                 holder.bookPrice.text = model.Price_Book
                 Glide.with(this@ViewBooks).load(model.Image_Book).into(holder.imageBook)
                 holder.editBook.setOnClickListener {
+
                     intent(
                         model.id,
                         model.Name_Book,
