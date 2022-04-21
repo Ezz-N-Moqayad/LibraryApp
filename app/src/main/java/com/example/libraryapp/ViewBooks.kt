@@ -26,7 +26,6 @@ class ViewBooks : AppCompatActivity() {
 
     lateinit var database: DatabaseReference;
     private var adapter: FirebaseRecyclerAdapter<Book, BookViewHolder>? = null
-    var count = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,7 +73,6 @@ class ViewBooks : AppCompatActivity() {
                         model.Price_Book
                     )
                 }
-                count++
             }
         }
         rcvBook.layoutManager = LinearLayoutManager(this)
