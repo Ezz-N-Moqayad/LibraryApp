@@ -11,6 +11,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
@@ -188,7 +189,15 @@ class EditingBook : AppCompatActivity() {
             "Book_Review" to flo.toString()
         )
         val id = intent.getStringExtra("id").toString()
-        database.child("Books").child(id).updateChildren(values)
+        database.child("Books").child(id).updateChildren(values).addOnSuccessListener {
+            FCMService.sendRemoteNotification(
+                "Edit Book",
+                "${editNameBook.text} Book was edited recently"
+            )
+            finish()
+        }.addOnFailureListener {
+            Log.e("test", "onResume: ${it.message}")
+        }
     }
 
     private fun deleteBook() {

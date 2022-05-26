@@ -12,6 +12,7 @@ import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.*
@@ -190,6 +191,12 @@ class AddBook : AppCompatActivity() {
             "Book_Review" to bookReview
         )
         database.child("Books/$id").setValue(book)
+            .addOnSuccessListener {
+                FCMService.sendRemoteNotification("Add Book", "$nameBook Book was added recently")
+                finish()
+            }.addOnFailureListener {
+                Log.e("test", "onResume: ${it.message}")
+            }
     }
 
     private fun videoPickDialog() {
